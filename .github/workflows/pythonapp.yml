@@ -1,4 +1,4 @@
-name: News Service
+name: UAA Service
 
 on: [push]
 
