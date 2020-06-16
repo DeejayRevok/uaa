@@ -5,7 +5,7 @@ import inspect
 
 from sqlalchemy.engine import Engine
 
-from uaa import models
+import models
 
 
 def initialize_db(db_engine: Engine):
