@@ -31,7 +31,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage_uaa.xml
       - name: Build the docker image
-        run: docker-compose -f docker/docker-compose.yml build uaa && docker tag uaa:latest djrevok/uaa:latest
+        run: docker build -t djrevok/uaa:latest .
       - name: Login to docker hub
         if: github.ref == 'refs/heads/develop'
         uses: actions-hub/docker/login@master

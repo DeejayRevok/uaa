@@ -9,7 +9,7 @@ RUN echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee -
 RUN apt-get update && apt-get install metricbeat && apt-get install default-libmysqlclient-dev
 
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install -r ./uaa/requirements.txt
 
 COPY ./tools_config/metricbeat.yml /etc/metricbeat/metricbeat.yml
 
