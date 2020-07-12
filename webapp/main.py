@@ -3,7 +3,9 @@ Application main module
 """
 import sys
 
+import aiohttp_cors
 from aiohttp.web_app import Application
+from aiohttp.web_urldispatcher import StaticResource
 from aiohttp_apispec import validation_middleware
 from news_service_lib import HealthCheck, server_runner
 
@@ -39,8 +41,21 @@ def init_uaa(app: Application) -> Application:
 
     HealthCheck(app, health_check)
 
+    cors = aiohttp_cors.setup(app, defaults={
+        "*": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*",
+            allow_methods="*"
+        )
+    })
+
     users_view.setup_routes(app)
     auth_view.setup_routes(app)
+
+    for route in list(app.router.routes()):
+        if not isinstance(route.resource, StaticResource):
+            cors.add(route)
 
     app.middlewares.append(error_middleware)
     app.middlewares.append(auth_middleware)

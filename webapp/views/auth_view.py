@@ -2,7 +2,7 @@
 Authentication views module
 """
 from aiohttp.web_app import Application
-from aiohttp.web_exceptions import HTTPBadRequest
+from aiohttp.web_exceptions import HTTPBadRequest, HTTPOk
 from aiohttp.web_request import Request
 from aiohttp.web_response import Response, json_response
 from aiohttp_apispec import docs, request_schema
@@ -59,6 +59,38 @@ class AuthViews:
         token_response = await self.auth_service.authenticate(username, password)
 
         return json_response(token_response, status=200)
+
+    @docs(
+        tags=['Authentication'],
+        summary="Authenticate user",
+        description="Authenticate an user by username and password"
+    )
+    @request_schema(PostAuthSchema)
+    @ROUTES.post(f'/{API_VERSION}{ROOT_PATH}/persist')
+    async def authenticate_cookie(self, request: Request) -> Response:
+        """
+        Request to authenticate an user setting the cookie
+
+        Args:
+            request: input REST request
+
+        Returns: json REST response
+
+        """
+        LOGGER.info('REST request to authenticate an user setting the cookie')
+
+        try:
+            username = request['data']['username']
+            password = request['data']['password']
+        except Exception as ex:
+            raise HTTPBadRequest(text=str(ex))
+
+        json_token = await self.auth_service.authenticate(username, password)
+        response = HTTPOk()
+        response.set_cookie(name='JWT_TOKEN', value=json_token['token'],
+                            httponly='true')
+
+        return response
 
     @docs(
         tags=['Authentication'],
