@@ -56,40 +56,25 @@ class AuthViews:
         except Exception as ex:
             raise HTTPBadRequest(text=str(ex))
 
-        token_response = await self.auth_service.authenticate(username, password)
+        token_json = await self.auth_service.authenticate(username, password)
 
-        return json_response(token_response, status=200)
+        token_response = json_response(token_json, status=200)
+        token_response.set_cookie(name='JWT_TOKEN', value=token_json['token'],
+                                  httponly='true')
+        return token_response
 
-    @docs(
-        tags=['Authentication'],
-        summary="Authenticate user",
-        description="Authenticate an user by username and password"
-    )
-    @request_schema(PostAuthSchema)
-    @ROUTES.post(f'/{API_VERSION}{ROOT_PATH}/persist')
-    async def authenticate_cookie(self, request: Request) -> Response:
+    @ROUTES.delete(f'/{API_VERSION}{ROOT_PATH}')
+    async def logout(self, _: Request):
         """
-        Request to authenticate an user setting the cookie
+        Delete the authorization cookie.
 
         Args:
-            request: input REST request
+            _: input REST request
 
         Returns: json REST response
-
         """
-        LOGGER.info('REST request to authenticate an user setting the cookie')
-
-        try:
-            username = request['data']['username']
-            password = request['data']['password']
-        except Exception as ex:
-            raise HTTPBadRequest(text=str(ex))
-
-        json_token = await self.auth_service.authenticate(username, password)
         response = HTTPOk()
-        response.set_cookie(name='JWT_TOKEN', value=json_token['token'],
-                            httponly='true')
-
+        response.del_cookie('JWT_TOKEN')
         return response
 
     @docs(
