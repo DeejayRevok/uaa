@@ -63,6 +63,12 @@ class AuthViews:
                                   httponly='true')
         return token_response
 
+    @docs(
+        tags=['Authentication'],
+        summary="Logout the authenticated user",
+        description="Delete the authentication cookies associated with the request"
+    )
+    @request_schema(PostAuthSchema)
     @ROUTES.delete(f'/{API_VERSION}{ROOT_PATH}')
     async def logout(self, _: Request):
         """
