@@ -2,7 +2,7 @@
 Authentication views module
 """
 from aiohttp.web_app import Application
-from aiohttp.web_exceptions import HTTPBadRequest
+from aiohttp.web_exceptions import HTTPBadRequest, HTTPOk
 from aiohttp.web_request import Request
 from aiohttp.web_response import Response, json_response
 from aiohttp_apispec import docs, request_schema
@@ -54,11 +54,34 @@ class AuthViews:
             username = request['data']['username']
             password = request['data']['password']
         except Exception as ex:
-            raise HTTPBadRequest(text=str(ex))
+            raise HTTPBadRequest(text=str(ex)) from ex
 
-        token_response = await self.auth_service.authenticate(username, password)
+        token_json = await self.auth_service.authenticate(username, password)
 
-        return json_response(token_response, status=200)
+        token_response = json_response(token_json, status=200)
+        token_response.set_cookie(name='JWT_TOKEN', value=token_json['token'],
+                                  httponly='true')
+        return token_response
+
+    @docs(
+        tags=['Authentication'],
+        summary="Logout the authenticated user",
+        description="Delete the authentication cookies associated with the request"
+    )
+    @request_schema(PostAuthSchema)
+    @ROUTES.delete(f'/{API_VERSION}{ROOT_PATH}')
+    async def logout(self, _: Request):
+        """
+        Delete the authorization cookie.
+
+        Args:
+            _: input REST request
+
+        Returns: json REST response
+        """
+        response = HTTPOk()
+        response.del_cookie('JWT_TOKEN')
+        return response
 
     @docs(
         tags=['Authentication'],
@@ -82,7 +105,7 @@ class AuthViews:
         try:
             token = request['data']['token']
         except Exception as ex:
-            raise HTTPBadRequest(text=str(ex))
+            raise HTTPBadRequest(text=str(ex)) from ex
 
         user = await self.auth_service.validate_token(token)
 
