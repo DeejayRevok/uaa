@@ -54,7 +54,7 @@ class AuthViews:
             username = request['data']['username']
             password = request['data']['password']
         except Exception as ex:
-            raise HTTPBadRequest(text=str(ex))
+            raise HTTPBadRequest(text=str(ex)) from ex
 
         token_json = await self.auth_service.authenticate(username, password)
 
@@ -105,7 +105,7 @@ class AuthViews:
         try:
             token = request['data']['token']
         except Exception as ex:
-            raise HTTPBadRequest(text=str(ex))
+            raise HTTPBadRequest(text=str(ex)) from ex
 
         user = await self.auth_service.validate_token(token)
 

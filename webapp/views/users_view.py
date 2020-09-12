@@ -80,7 +80,7 @@ class UserViews:
             username = request['data']['username']
             password = request['data']['password']
         except Exception as ex:
-            raise HTTPBadRequest(text=str(ex))
+            raise HTTPBadRequest(text=str(ex)) from ex
 
         user_created = await self.user_service.create_user(username, password)
 
