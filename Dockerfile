@@ -14,4 +14,4 @@ RUN pip install -r ./uaa/requirements.txt
 COPY ./tools_config/metricbeat.yml /etc/metricbeat/metricbeat.yml
 
 EXPOSE 8081
-CMD service metricbeat start && export PYTHONPATH=${PYTHONPATH}:/app && python ./uaa/webapp/main.py -p DOCKER
+CMD service metricbeat start && export PYTHONPATH=${PYTHONPATH}:/app/uaa && python ./uaa/webapp/main.py -p DOCKER
