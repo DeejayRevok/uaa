@@ -2,8 +2,9 @@
 Authentication module
 """
 from news_service_lib import generate_token, decode_token
+
 from lib.pass_tools import hash_password
-from models.user import User
+from models import User
 from services.users_service import UserService
 
 

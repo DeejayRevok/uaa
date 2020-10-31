@@ -3,7 +3,7 @@ User service test cases
 """
 import asyncio
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from models.user import User
 from services.users_service import UserService
@@ -16,13 +16,14 @@ class TestUserService(TestCase):
     """
     User service test cases
     """
-    @patch('services.users_service.SqlStorage')
-    def setUp(self, client_mock):
+    @patch('services.users_service.storage_factory')
+    def setUp(self, factory_mock):
         """
         Set up each test environment
         """
-        self.client_mock = client_mock
-        self.user_service = UserService(client_mock)
+        self.client_mock = MagicMock()
+        factory_mock.return_value = self.client_mock
+        self.user_service = UserService(MagicMock())
 
     @patch('services.users_service.hash_password')
     def test_create_user(self, hash_mock):

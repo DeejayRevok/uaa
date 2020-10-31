@@ -2,10 +2,8 @@
 User model module
 """
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.engine import Engine
-from sqlalchemy.ext.declarative import declarative_base
 
-BASE = declarative_base()
+from models.base import BASE
 
 
 class User(BASE):
@@ -27,14 +25,3 @@ class User(BASE):
         """
         yield 'id', self.id
         yield 'username', self.username
-
-
-def create_schema(db_engine: Engine):
-    """
-    Create the user model table
-
-    Args:
-        db_engine: database engine
-
-    """
-    BASE.metadata.tables['users'].create(db_engine, checkfirst=True)

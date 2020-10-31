@@ -5,11 +5,12 @@ import sys
 
 from aiohttp.web_app import Application
 from aiohttp_apispec import validation_middleware
+
+from models import BASE
 from news_service_lib import HealthCheck, server_runner
 
-from infrastructure.storage.db_initializer import initialize_db
-from infrastructure.storage.sql_storage import SqlStorage
 from log_config import LOG_CONFIG, get_logger
+from news_service_lib.storage.sql_utils import create_sql_engine, SqlEngineType, sql_health_check, init_sql_db
 from services.authentication_service import AuthService
 from services.users_service import UserService
 from webapp.definitions import API_VERSION, CONFIG_PATH, health_check
@@ -28,13 +29,15 @@ def init_uaa(app: Application) -> Application:
     """
     storage_config = app['config'].get_section('storage')
 
-    store_client = SqlStorage(**storage_config)
+    storage_engine = create_sql_engine(SqlEngineType.MYSQL, **storage_config)
+    init_sql_db(BASE, storage_engine)
 
-    if not store_client.health_check():
+    if not sql_health_check(storage_engine):
         sys.exit(1)
 
-    initialize_db(store_client.engine)
-    app['user_service'] = UserService(store_client)
+    app['storage_engine'] = storage_engine
+
+    app['user_service'] = UserService(storage_engine)
     app['auth_service'] = AuthService(app['user_service'])
 
     HealthCheck(app, health_check)
