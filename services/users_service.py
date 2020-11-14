@@ -1,14 +1,14 @@
 """
 Users service module
 """
-from sqlalchemy.engine import Engine
-
 from news_service_lib.storage import StorageError, storage_factory, StorageType
 from news_service_lib.storage.filter import MatchFilter
+from news_service_lib.storage.sql import SqlSessionProvider
 
 from lib.pass_tools import hash_password
 from models import User
 from log_config import get_logger
+
 
 LOGGER = get_logger()
 
@@ -18,14 +18,15 @@ class UserService:
     User service implementation
     """
 
-    def __init__(self, db_engine: Engine):
+    def __init__(self, session_provider: SqlSessionProvider):
         """
-        Initialize the user service with the specified database engine
+        Initialize the user service with the specified session provider
 
         Args:
-            db_engine: database engine
+            session_provider: database sql sessions provider
         """
-        self._repo = storage_factory(StorageType.SQL.value, dict(engine=db_engine, model=User), logger=LOGGER)
+        self._repo = storage_factory(StorageType.SQL.value, dict(session_provider=session_provider, model=User),
+                                     logger=LOGGER)
 
     async def create_user(self, username: str, password: str) -> User:
         """

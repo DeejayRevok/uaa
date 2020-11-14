@@ -5,7 +5,7 @@ from os.path import join, dirname
 
 from aiohttp.web_app import Application
 
-from news_service_lib.storage.sql_utils import sql_health_check
+from news_service_lib.storage.sql import sql_health_check
 
 API_VERSION = 'v1'
 CONFIG_PATH = join(dirname(dirname(__file__, )), 'configs')
