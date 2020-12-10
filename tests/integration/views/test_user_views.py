@@ -69,7 +69,7 @@ class TestUserViews(AioHTTPTestCase):
         """
         Test the get user data REST endpoint
         """
-        resp = await self.client.get(f'/{API_VERSION}{ROOT_PATH}/data')
+        resp = await self.client.get(f'/{API_VERSION}{ROOT_PATH}/me')
         self.assertEqual(resp.status, 200)
         response_content = await resp.json()
         self.assertEqual(response_content['username'], MOCKED_USER.username)
