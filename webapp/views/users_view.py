@@ -37,7 +37,7 @@ class UserViews:
         description="Get authenticated user data",
         security=[{'ApiKeyAuth': []}]
     )
-    @ROUTES.get(f'/{API_VERSION}{ROOT_PATH}/data', allow_head=False)
+    @ROUTES.get(f'/{API_VERSION}{ROOT_PATH}/me', allow_head=False)
     async def get_user_data(self, request: Request) -> Response:
         """
         Request to get an user identified by its username

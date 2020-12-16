@@ -5,7 +5,7 @@ from os.path import join, dirname
 
 from aiohttp.web_app import Application
 
-from infrastructure.storage.sql_storage import SqlStorage
+from news_service_lib.storage.sql import sql_health_check
 
 API_VERSION = 'v1'
 CONFIG_PATH = join(dirname(dirname(__file__, )), 'configs')
@@ -21,6 +21,4 @@ async def health_check(app: Application) -> bool:
     Returns: True if the status is OK, False otherwise
 
     """
-    storage_config = app['config'].get_section('storage')
-    storage = SqlStorage(**storage_config)
-    return storage.health_check()
+    return sql_health_check(app['storage_engine'])

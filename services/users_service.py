@@ -1,25 +1,32 @@
 """
 Users service module
 """
-from sqlalchemy.exc import IntegrityError
+from news_service_lib.storage import StorageError, storage_factory, StorageType
+from news_service_lib.storage.filter import MatchFilter
+from news_service_lib.storage.sql import SqlSessionProvider
 
-from infrastructure.storage.sql_storage import SqlStorage
 from lib.pass_tools import hash_password
-from models.user import User
+from models import User
+from log_config import get_logger
+
+
+LOGGER = get_logger()
 
 
 class UserService:
     """
     User service implementation
     """
-    def __init__(self, client: SqlStorage):
+
+    def __init__(self, session_provider: SqlSessionProvider):
         """
-        Initialize the service with the specified database client
+        Initialize the user service with the specified session provider
 
         Args:
-            client: database client
+            session_provider: database sql sessions provider
         """
-        self._client = client
+        self._repo = storage_factory(StorageType.SQL.value, dict(session_provider=session_provider, model=User),
+                                     logger=LOGGER)
 
     async def create_user(self, username: str, password: str) -> User:
         """
@@ -34,9 +41,8 @@ class UserService:
         """
         password_hash = hash_password(password)
         try:
-            return self._client.save(User(username=username, password=password_hash))
-        except IntegrityError:
-            self._client.rollback()
+            return self._repo.save(User(username=username, password=password_hash))
+        except StorageError:
             raise ValueError(f'User {username} already exists')
 
     async def get_user_by_id(self, identifier: int) -> User:
@@ -49,7 +55,7 @@ class UserService:
         Returns: queried user
 
         """
-        return self._client.get_one(User, id=identifier)
+        return self._repo.get_one(filters=[MatchFilter('id', identifier)])
 
     async def get_user_by_name(self, username: str) -> User:
         """
@@ -61,4 +67,4 @@ class UserService:
         Returns: queried user
 
         """
-        return self._client.get_one(User, username=username)
+        return self._repo.get_one(filters=[MatchFilter('username', username)])
