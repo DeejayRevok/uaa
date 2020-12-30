@@ -14,7 +14,7 @@ from news_service_lib.storage.sql import create_sql_engine, SqlEngineType, sql_h
     SqlSessionProvider
 from services.authentication_service import AuthService
 from services.users_service import UserService
-from webapp.definitions import API_VERSION, CONFIG_PATH, health_check
+from webapp.definitions import API_VERSION, CONFIG_PATH, health_check, ALEMBIC_INI_PATH
 from webapp.middlewares import error_middleware, auth_middleware
 from webapp.views import users_view, auth_view
 
@@ -33,7 +33,7 @@ def init_uaa(app: Application) -> Application:
     storage_engine = create_sql_engine(SqlEngineType.MYSQL, **storage_config)
     app['storage_engine'] = storage_engine
 
-    init_sql_db(BASE, storage_engine)
+    init_sql_db(BASE, storage_engine, alembic_ini_path=ALEMBIC_INI_PATH)
 
     if not sql_health_check(storage_engine):
         sys.exit(1)

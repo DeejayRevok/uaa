@@ -9,13 +9,17 @@ from models.user import User
 from services.users_service import UserService
 
 TEST_USERNAME = 'test_user'
-TEST_PASSWORD = 'test_password'
+TEST_PASSWORD = 'Test1@34'
+TEST_FIRST_NAME = 'test_first_name'
+TEST_LAST_NAME = 'test_last_name'
+TEST_EMAIL = 'test@test.com'
 
 
 class TestUserService(TestCase):
     """
     User service test cases
     """
+
     @patch('services.users_service.storage_factory')
     def setUp(self, factory_mock):
         """
@@ -25,18 +29,15 @@ class TestUserService(TestCase):
         factory_mock.return_value = self.client_mock
         self.user_service = UserService(MagicMock())
 
-    @patch('services.users_service.hash_password')
-    def test_create_user(self, hash_mock):
+    def test_create_user(self):
         """
         Chech if the create user service calls to the storage client persist method
         """
-        mock_hash_pass = 'mocked_hash_pass'
-        hash_mock.return_value = mock_hash_pass
         loop = asyncio.new_event_loop()
-        loop.run_until_complete(self.user_service.create_user(TEST_USERNAME, TEST_PASSWORD))
+        loop.run_until_complete(
+            self.user_service.create_user(TEST_USERNAME, TEST_PASSWORD, TEST_FIRST_NAME, TEST_LAST_NAME, TEST_EMAIL))
         self.client_mock.save.assert_called_once()
         self.assertEqual(self.client_mock.save.call_args[0][0].username, TEST_USERNAME)
-        self.assertEqual(self.client_mock.save.call_args[0][0].password, mock_hash_pass)
 
     def test_get_user_id(self):
         """

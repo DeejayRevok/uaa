@@ -13,7 +13,7 @@ from webapp.views.users_view import setup_routes
 from webapp.definitions import API_VERSION
 from webapp.views.users_view import ROOT_PATH
 
-MOCKED_USER = User(username='test_user', password='test_password')
+MOCKED_USER = User(username='test_user', password='Test1@34')
 
 
 async def mock_auth_middleware(_, handler):
@@ -80,7 +80,11 @@ class TestUserViews(AioHTTPTestCase):
         Test the post create user REST endpoint
         """
         resp = await self.client.post(f'/{API_VERSION}{ROOT_PATH}',
-                                      data={'username': MOCKED_USER.username, 'password': MOCKED_USER.password})
+                                      data={'username': MOCKED_USER.username,
+                                            'password': MOCKED_USER.password,
+                                            'first_name': 'test_fist_name',
+                                            'last_name': 'test_last_name',
+                                            'email': 'test_email'})
         self.assertEqual(resp.status, 200)
         response_content = await resp.json()
         self.assertEqual(response_content['username'], MOCKED_USER.username)

@@ -12,7 +12,7 @@ from webapp.middlewares import error_middleware
 from webapp.definitions import API_VERSION
 from webapp.views.auth_view import setup_routes, ROOT_PATH
 
-MOCKED_USER = User(username='test_user', password='test_password')
+MOCKED_USER = User(username='test_user', password='Test1@34')
 
 
 async def mock_auth_middleware(_, handler):
