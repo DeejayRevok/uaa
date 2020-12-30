@@ -79,10 +79,13 @@ class UserViews:
         try:
             username = request['data']['username']
             password = request['data']['password']
+            first_name = request['data']['first_name']
+            last_name = request['data']['last_name']
+            email = request['data']['email']
         except Exception as ex:
             raise HTTPBadRequest(text=str(ex)) from ex
 
-        user_created = await self.user_service.create_user(username, password)
+        user_created = await self.user_service.create_user(username, password, first_name, last_name, email)
 
         return json_response(dict(user_created), status=200)
 

@@ -5,10 +5,8 @@ from news_service_lib.storage import StorageError, storage_factory, StorageType
 from news_service_lib.storage.filter import MatchFilter
 from news_service_lib.storage.sql import SqlSessionProvider
 
-from lib.pass_tools import hash_password
 from models import User
 from log_config import get_logger
-
 
 LOGGER = get_logger()
 
@@ -28,22 +26,26 @@ class UserService:
         self._repo = storage_factory(StorageType.SQL.value, dict(session_provider=session_provider, model=User),
                                      logger=LOGGER)
 
-    async def create_user(self, username: str, password: str) -> User:
+    async def create_user(self, username: str, password: str, first_name: str, last_name: str, email: str) -> User:
         """
         Create a new user
 
         Args:
             username: user name
             password: user password
+            first_name: user's first name
+            last_name: user's last name
+            email: user's email address
 
         Returns: user model created
 
         """
-        password_hash = hash_password(password)
         try:
-            return self._repo.save(User(username=username, password=password_hash))
+            return self._repo.save(
+                User(username=username, password=password, first_name=first_name, last_name=last_name,
+                     email=email))
         except StorageError:
-            raise ValueError(f'User {username} already exists')
+            raise ValueError(f'User already exists')
 
     async def get_user_by_id(self, identifier: int) -> User:
         """
