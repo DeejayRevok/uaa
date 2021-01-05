@@ -26,5 +26,5 @@ def upgrade():
 
 def downgrade():
     op.drop_column('users', 'first_name')
-    op.add_column('users', 'last_name')
-    op.add_column('users', 'email')
+    op.drop_column('users', 'last_name')
+    op.drop_column('users', 'email')
